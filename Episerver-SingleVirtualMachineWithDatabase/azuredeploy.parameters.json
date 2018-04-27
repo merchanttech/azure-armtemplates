@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": { "value": "GET-PREREQ-VMName" },
+    "storagename": { "value": ""GET-PREREQ-StorageName" },
+    "vmSize": { "value": "Standard_B2s" },
+    "vmAdminPassword": { "value": "tGquM5P7zmPbgwdDEqxVe5ZJ" },
+    "sqlAdminPassword": { "value": "q25t7ztzxXZhrCTa3XGgKVMs" },
+    "omsWorkspaceId": { "value": "ea8ffbce-86bb-4a78-b707-a49a91838864" },
+    "omsWorkspaceKey": { "value": "zRZ6W5m+EZeYnermPNlxHxYzcOWLmyVOPOj/rYxZAK/3Ykrl2P1VpGcUOieguL3ewVN67cRZ8onQz6xjv8h7dA==" }
+  }
+}
