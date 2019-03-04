@@ -70,7 +70,8 @@
     "frontEndNSGName": "[concat(toLower(resourceGroup().name),'-', 'NSG')]",
     "vmOsDiskName": "[concat(parameters('vmName'),'-', 'OsDisk')]",
     "vmPublicIpName": "[concat(parameters('vmName'),'-', 'PIP')]",
-    "vmDomainNameLabel": "[toLower(parameters('vmName'))]"
+    "vmDomainNameLabel": "[toLower(parameters('vmName'))]",
+    "hostDNSNameScriptArgument": "[concat('*.',resourceGroup().location,'.cloudapp.azure.com')]"
   },
   "resources": [
     {
@@ -180,6 +181,20 @@
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 160,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "VSO-Custom-WinRM-Https-Port",
+            "properties": {
+              "description": "VSO-Custom-WinRM-Https-Port",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "5986",
+              "sourceAddressPrefix": "52.151.83.164",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 170,
               "direction": "Inbound"
             }
           }
@@ -331,7 +346,31 @@
             }
           ]
         }
-      }
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(parameters('vmName'),'/WinRMCustomScriptExtension')]",
+          "apiVersion": "2015-06-15",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-winrm-windows/ConfigureWinRM.ps1",
+                "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-winrm-windows/makecert.exe"
+              ],
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ConfigureWinRM.ps1 ',variables('hostDNSNameScriptArgument'))]"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "[variables('sqlServerName')]",
