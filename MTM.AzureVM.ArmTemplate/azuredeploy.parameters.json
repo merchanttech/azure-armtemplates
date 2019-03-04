@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": { "value": "IneosChinaUat" },
+    "vmSize": { "value": "Standard_B4MS" },
+    "vmAdminUsername": { "value": "CaptainChinaUat" },
+    "vmAdminPassword": { "value": "B8U9CkgpyVQ3QwWLe453KEquYLuLgTSs" },
+    "sqlAdminUsername": { "value": "CaptainChinaUat" },
+    "sqlAdminPassword": { "value": "TkWV7rGKy64sAnJSjuUYN7sqKyLds27h" },
+    "azurecostcentre": { "value": "Ineos Hosting" },
+    "azuresecondarycostcentre": { "value": "China UAT Environment" }
+  }
+}

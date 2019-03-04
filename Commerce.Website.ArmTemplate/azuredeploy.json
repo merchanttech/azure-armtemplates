@@ -1,0 +1,421 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "azurecostcentre": {
+      "type": "string"
+    },
+    "azuresecondarycostcentre": {
+      "type": "string"
+    },
+    "hostingPlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cmsWebsiteName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commerceWebsiteName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sqlserverName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "storageaccountName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "serviceBusNamespaceName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "serviceBusSku": {
+      "type": "string",
+      "allowedValues": [
+        "Standard",
+        "Premium"
+      ],
+      "defaultValue": "Standard",
+      "metadata": {
+        "description": "The messaging tier for service Bus namespace"
+      }
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "administratorLogin": {
+      "type": "string"
+    },
+    "administratorLoginPassword": {
+      "type": "securestring"
+    },
+    "cmsDatabaseName": {
+      "type": "string"
+    },
+    "commerceDatabaseName": {
+      "type": "string"
+    },
+    "collation": {
+      "type": "string",
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "edition": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    },
+    "maxSizeBytes": {
+      "type": "string",
+      "defaultValue": "1073741824"
+    },
+    "requestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Edition"
+      }
+    },
+    "storageType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.3.0.0/16",
+      "metadata": {
+        "description": "Address Prefix"
+      }
+    },
+    "subnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.3.0.0/24",
+      "metadata": {
+        "description": "Subnet prefix"
+      }
+    },
+    "publicIPAddressType": {
+      "type": "string",
+      "defaultValue": "Dynamic",
+      "allowedValues": [
+        "Dynamic",
+        "Static"
+      ],
+      "metadata": {
+        "description": "Type of public IP address"
+      }
+    },
+    "gatewaySubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.3.200.0/29",
+      "metadata": {
+        "description": "CIDR block for gateway subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },
+    "gatewaySku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "HighPerformance"
+      ],
+      "metadata": {
+        "description": "The Sku of the Gateway. This must be one of Basic, Standard or HighPerformance."
+      }
+    },
+    "vpnType": {
+      "type": "String",
+      "metadata": {
+        "description": "Route based (Dynamic Gateway) or Policy based (Static Gateway)"
+      },
+      "defaultValue": "RouteBased",
+      "allowedValues": [
+        "RouteBased",
+        "PolicyBased"
+      ]
+    }
+  },
+  "variables": {
+    "sbVersionOld": "2014-09-01",
+    "defaultSASKeyName": "RootManageSharedAccessKey",
+    "sbVersion": "2017-04-01",
+    "hostingplan": "[concat(resourceGroup().name,'-', parameters('hostingPlanName'))]",
+    "storageaccount": "[concat(toLower(resourceGroup().name), parameters('storageAccountName'))]",
+    "servicebus": "[concat(toLower(resourceGroup().name),'-', parameters('serviceBusNamespaceName'))]",
+    "sqlservername": "[concat(toLower(resourceGroup().name),'-', parameters('sqlserverName'))]",
+    "cmsWebsiteName": "[concat(resourceGroup().name,'-', parameters('cmsWebsiteName'))]",
+    "commerceWebsiteName": "[concat(resourceGroup().name,'-', parameters('commerceWebsiteName'))]",
+    "namespaceAuthRuleName": "[concat(variables('servicebus'), concat('/', variables('defaultSASKeyName')))]",
+    "nsAuthorizationRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('servicebus'), variables('defaultSASKeyName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('hostingplan')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "HostingPlan",
+        "costcentre": "[parameters('azurecostcentre')]",
+        "secondarycostcentre": "[parameters('azuresecondarycostcentre')]"
+      },
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuCapacity')]"
+      },
+      "properties": {
+        "name": "[variables('hostingplan')]"
+      }
+    },
+    {
+      "name": "[variables('storageaccount')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('storageType')]"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "storageaccount",
+        "costcentre": "[parameters('azurecostcentre')]",
+        "secondarycostcentre": "[parameters('azuresecondarycostcentre')]"
+      },
+      "kind": "Storage"
+    },
+    {
+      "apiVersion": "2017-04-01",
+      "name": "[variables('servicebus')]",
+      "type": "Microsoft.ServiceBus/namespaces",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "ServiceBus"
+      },
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "properties": {},
+      "resources": [
+        {
+          "apiVersion": "2017-04-01",
+          "name": "[variables('namespaceAuthRuleName')]",
+          "type": "Microsoft.ServiceBus/namespaces/authorizationRules",
+          "tags": {
+            "displayName": "RootAccessKey",
+            "costcentre": "[parameters('azurecostcentre')]",
+            "secondarycostcentre": "[parameters('azuresecondarycostcentre')]"
+          },
+          "dependsOn": [
+            "[concat('Microsoft.ServiceBus/namespaces/', variables('servicebus'))]"
+          ],
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "rights": [
+              "Send",
+              "Listen",
+              "Manage"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('sqlservername')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "SqlServer",
+        "costcentre": "[parameters('azurecostcentre')]",
+        "secondarycostcentre": "[parameters('azuresecondarycostcentre')]"
+      },
+      "apiVersion": "2014-04-01-preview",
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]"
+      },
+      "resources": [
+        {
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers/', variables('sqlservername'))]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('cmsWebsiteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverFarms/', variables('hostingplan'))]"
+      ],
+      "tags": {
+        "displayName": "CMSWebsite",
+        "costcentre": "[parameters('azurecostcentre')]",
+        "secondarycostcentre": "[parameters('azuresecondarycostcentre')]"
+      },
+      "properties": {
+        "name": "[variables('cmsWebsiteName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingplan'))]",
+        "siteConfig": {
+          "webSocketsEnabled": true,
+          "ipSecurityRestrictions": [
+            {
+              "ipAddress": "195.8.193.195"
+            },
+            {
+              "ipAddress": "80.2.88.26"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "type": "config",
+          "name": "connectionstrings",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites/', variables('cmsWebsiteName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageaccount'))]",
+            "[resourceId('Microsoft.ServiceBus/namespaces/', variables('servicebus'))]"
+          ],
+          "properties": {
+            "EPiServerDB": {
+              "value": "[concat('Data Source=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sqlservername'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('cmsDatabaseName'), ';User Id=', parameters('administratorLogin'), '@',variables('sqlservername'), ';Password=', parameters('administratorLoginPassword'), ';', 'Trusted_Connection=False;Encrypt=True;MultipleActiveResultSets=True;TrustServerCertificate=False;Connection Timeout=30')]",
+              "type": "SQLAzure"
+            },
+            "EcfSqlConnection": {
+              "value": "[concat('Data Source=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sqlservername'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('commerceDatabaseName'), ';User Id=', parameters('administratorLogin'), '@',variables('sqlservername'), ';Password=', parameters('administratorLoginPassword'), ';', 'Trusted_Connection=False;Encrypt=True;MultipleActiveResultSets=True;TrustServerCertificate=False;Connection Timeout=30')]",
+              "type": "SQLAzure"
+            },
+            "EPiServerAzureBlobs": {
+              "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageaccount'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageaccount')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+              "type": "Custom"
+            },
+            "EPiServerAzureEvents": {
+              "value": "[listkeys(variables('nsAuthorizationRuleResourceId'), variables('sbVersion')).primaryConnectionString]",
+              "type": "Custom"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('commerceWebsiteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverFarms/', variables('hostingplan'))]"
+      ],
+      "tags": {
+        "displayName": "CommerceWebsite",
+        "costcentre": "[parameters('azurecostcentre')]",
+        "secondarycostcentre": "[parameters('azuresecondarycostcentre')]"
+      },
+      "properties": {
+        "name": "[variables('commerceWebsiteName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingplan'))]",
+        "siteConfig": {
+          "webSocketsEnabled": true,
+          "ipSecurityRestrictions": [
+            {
+              "ipAddress": "195.8.193.195"
+            },
+            {
+              "ipAddress": "80.2.88.26"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "type": "config",
+          "name": "connectionstrings",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites/', variables('commerceWebsiteName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageaccount'))]",
+            "[resourceId('Microsoft.ServiceBus/namespaces/', variables('servicebus'))]"
+          ],
+          "properties": {
+            "EPiServerDB": {
+              "value": "[concat('Data Source=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sqlservername'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('commerceDatabaseName'), ';User Id=', parameters('administratorLogin'), '@',variables('sqlservername'), ';Password=', parameters('administratorLoginPassword'), ';', 'Trusted_Connection=False;Encrypt=True;MultipleActiveResultSets=True;TrustServerCertificate=False;Connection Timeout=30')]",
+              "type": "SQLAzure"
+            },
+            "EcfSqlConnection": {
+              "value": "[concat('Data Source=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sqlservername'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('commerceDatabaseName'), ';User Id=', parameters('administratorLogin'), '@',variables('sqlservername'), ';Password=', parameters('administratorLoginPassword'), ';', 'Trusted_Connection=False;Encrypt=True;MultipleActiveResultSets=True;TrustServerCertificate=False;Connection Timeout=30')]",
+              "type": "SQLAzure"
+            },
+            "EPiServerAzureBlobs": {
+              "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageaccount'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageaccount')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+              "type": "Custom"
+            },
+            "EPiServerAzureEvents": {
+              "value": "[listkeys(variables('nsAuthorizationRuleResourceId'), variables('sbVersion')).primaryConnectionString]",
+              "type": "Custom"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

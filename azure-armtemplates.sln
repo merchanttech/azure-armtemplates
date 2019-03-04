@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Commerce.Website.ArmTemplate", "Commerce.Website.ArmTemplate\Commerce.Website.ArmTemplate.deployproj", "{C4BA6EDA-F728-4D22-B2ED-295F3B8E1819}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "MTM.AzureVM.ArmTemplate", "MTM.AzureVM.ArmTemplate\MTM.AzureVM.ArmTemplate.deployproj", "{D5227AE6-7709-4BE3-9D03-112E1236AA25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PowershellScripts", "PowershellScripts", "{F1F0A6AB-BD2D-422C-AC91-6E5F7188B574}"
+	ProjectSection(SolutionItems) = preProject
+		PowershellScripts\ConfigureWebServer.ps1 = PowershellScripts\ConfigureWebServer.ps1
+		PowershellScripts\CreateIISConfigFileSizeRegistrySetting.ps1 = PowershellScripts\CreateIISConfigFileSizeRegistrySetting.ps1
+		PowershellScripts\Install-UrlRewriteModule.ps1 = PowershellScripts\Install-UrlRewriteModule.ps1
+		PowershellScripts\Install-WebDeploy.ps1 = PowershellScripts\Install-WebDeploy.ps1
+		PowershellScripts\InstallChocolatey.ps1 = PowershellScripts\InstallChocolatey.ps1
+		PowershellScripts\Microsoft.Web.XmlTransform.dll = PowershellScripts\Microsoft.Web.XmlTransform.dll
+		Readme.txt = Readme.txt
+		PowershellScripts\SelectSubscription.ps1 = PowershellScripts\SelectSubscription.ps1
+		PowershellScripts\TransformConfig.ps1 = PowershellScripts\TransformConfig.ps1
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4BA6EDA-F728-4D22-B2ED-295F3B8E1819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4BA6EDA-F728-4D22-B2ED-295F3B8E1819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4BA6EDA-F728-4D22-B2ED-295F3B8E1819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4BA6EDA-F728-4D22-B2ED-295F3B8E1819}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5227AE6-7709-4BE3-9D03-112E1236AA25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5227AE6-7709-4BE3-9D03-112E1236AA25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5227AE6-7709-4BE3-9D03-112E1236AA25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5227AE6-7709-4BE3-9D03-112E1236AA25}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF393A98-51DB-420B-8A77-F2BD822CB2A7}
+	EndGlobalSection
+EndGlobal

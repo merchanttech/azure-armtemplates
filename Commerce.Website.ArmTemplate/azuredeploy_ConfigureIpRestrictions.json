@@ -1,0 +1,44 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "hostingPlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "websiteName": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "variables": {    
+    "hostingplan": "[concat(resourceGroup().name,'-', parameters('hostingPlanName'))]",
+    "website": "[concat(resourceGroup().name,'-', parameters('websiteName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('website')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",      
+      "tags": {
+        "displayName": "Website"
+      },
+      "properties": {
+        "name": "[variables('website')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingplan'))]",
+        "siteConfig": {
+          "webSocketsEnabled": true,
+          "ipSecurityRestrictions": [
+            {
+              "ipAddress": "195.8.193.195"
+            },
+            {
+              "ipAddress": "92.13.69.250"
+            }            
+          ]
+        }
+      }
+    }
+  ]
+}

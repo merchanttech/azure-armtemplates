@@ -1,0 +1,1 @@
+C:\Development\Repos\mtm-magazine-testhost\MTM.Magazine.TestingHost.ArmTemplate\obj\Debug\MTM.Magazine.TestingHost.ArmTemplate.deployproj.CoreCompileInputs.cache

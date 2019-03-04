@@ -1,0 +1,27 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "hostingPlanName": {
+      "value": "hostingplan"
+    },
+    "skuName": { "value": "S1" },
+    "cmsWebsiteName": { "value": "CmsWebsite" },
+    "commerceWebsiteName": { "value": "CommerceWebsite" },
+    "sqlserverName": { "value": "sqlserver" },
+    "storageaccountName": { "value": "storage" },
+    "serviceBusNamespaceName": { "value": "servicebus" },
+    "administratorLogin": {
+      "value": "Captain"
+    },
+    "cmsDatabaseName": {
+      "value": "CmsDB"
+    },
+    "commerceDatabaseName": {
+      "value": "CommerceDB"
+    },
+    "administratorLoginPassword": { "value": "hS2Q7MVjnEVbEnGXf5N7PrwZ" },
+    "azurecostcentre": { "value": "MTM Hosting" },
+    "azuresecondarycostcentre": { "value": "Commerce Demo Site" }
+  }
+}
